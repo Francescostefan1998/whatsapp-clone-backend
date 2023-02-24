@@ -4,12 +4,16 @@ import cors from "cors";
 import mongoose from "mongoose";
 import passport from "passport";
 import userRouter from "./api/users/index.js";
+import messageRouter from "./api/messages/index.js";
+import chatRouter from "./api/chats/index.js";
 const server = express();
 const port = process.env.PORT || 3001;
 
 server.use(cors());
 server.use(express.json());
 server.use("/users", userRouter);
+server.use("/chats", chatRouter);
+server.use("/messages", messageRouter);
 mongoose.connect(process.env.MONGO_URL);
 mongoose.connection.on("connected", () => {
   console.log("Connected to mongo db");

@@ -29,9 +29,7 @@ userRouter.get("/:userId", async (req, res, next) => {
     if (user) {
       res.send(user);
     } else {
-      next(
-        createHttpError(404, `BlogPost wit id ${req.params.userId} not found`)
-      );
+      next(createHttpError(404, `user with id ${req.params.userId} not found`));
     }
   } catch (error) {
     next(error);
@@ -48,9 +46,7 @@ userRouter.put("/:userId", async (req, res, next) => {
     if (updateUser) {
       res.send(updateUser);
     } else {
-      next(
-        createHttpError(404, `BlogPost wit id ${req.params.userId} not found`)
-      );
+      next(createHttpError(404, `user with id ${req.params.userId} not found`));
     }
   } catch (error) {
     next(error);
@@ -67,7 +63,7 @@ userRouter.delete(
         res.status(204).send("deleted");
       } else {
         next(
-          createHttpError(404, `BlogPost wit id ${req.params.userId} not found`)
+          createHttpError(404, `user with id ${req.params.userId} not found`)
         );
       }
     } catch (error) {
