@@ -4,7 +4,7 @@ import passport from "passport";
 import ChatModel from "./model.js";
 
 const chatRouter = express.Router();
-chatRouter.get("/", async (req, res, next) => {
+chatRouter.get("/:userId", async (req, res, next) => {
   try {
     const chats = await ChatModel.find();
     res.send(chats);
@@ -13,17 +13,20 @@ chatRouter.get("/", async (req, res, next) => {
   }
 });
 
-chatRouter.post("/", async (req, res, next) => {
+chatRouter.post("/:userId", async (req, res, next) => {
   try {
     console.log("POST");
-    const newChat = new ChatModel(req.body);
+    const newChat = new ChatModel({
+      ...req.body,
+      users: [...users, req.params.userId],
+    });
     const { _id } = await newChat.save();
     res.status(201).send({ _id });
   } catch (error) {
     next(error);
   }
 });
-chatRouter.get("/:chatId", async (req, res, next) => {
+chatRouter.get("/:userId/:chatId", async (req, res, next) => {
   try {
     const chat = await ChatModel.findById(req.params.chatId);
     if (chat) {
@@ -36,7 +39,7 @@ chatRouter.get("/:chatId", async (req, res, next) => {
   }
 });
 
-chatRouter.put("/:chatId", async (req, res, next) => {
+chatRouter.put("/:userId/:chatId", async (req, res, next) => {
   try {
     const updateChat = await ChatModel.findByIdAndUpdate(
       req.params.chatId,
@@ -54,7 +57,7 @@ chatRouter.put("/:chatId", async (req, res, next) => {
 });
 
 chatRouter.delete(
-  "/:chatId",
+  "/:userId/:chatId",
 
   async (req, res, next) => {
     try {

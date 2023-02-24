@@ -4,7 +4,7 @@ import passport from "passport";
 import MessageModel from "./model.js";
 
 const messageRouter = express.Router();
-messageRouter.get("/", async (req, res, next) => {
+messageRouter.get("/:userId/:chatId", async (req, res, next) => {
   try {
     const messages = await MessageModel.find();
     res.send(messages);
@@ -13,17 +13,21 @@ messageRouter.get("/", async (req, res, next) => {
   }
 });
 
-messageRouter.post("/", async (req, res, next) => {
+messageRouter.post("/:userId/:chatId", async (req, res, next) => {
   try {
     console.log("POST");
-    const newMessage = new MessageModel(req.body);
+    const newMessage = new MessageModel({
+      ...req.body,
+      chat: req.params.chatId, // assuming the chat ID is available in the req object
+      user: req.params.userId, // assuming the user ID is available in the req object
+    });
     const { _id } = await newMessage.save();
     res.status(201).send({ _id });
   } catch (error) {
     next(error);
   }
 });
-messageRouter.get("/:messageId", async (req, res, next) => {
+messageRouter.get("/:userId/:chatId/:messageId", async (req, res, next) => {
   try {
     const message = await MessageModel.findById(req.params.messageId);
     if (message) {
@@ -41,7 +45,7 @@ messageRouter.get("/:messageId", async (req, res, next) => {
   }
 });
 
-messageRouter.put("/:messageId", async (req, res, next) => {
+messageRouter.put("/:userId/:chatId/:messageId", async (req, res, next) => {
   try {
     const updatedMessage = await MessageModel.findByIdAndUpdate(
       req.params.messageId,
@@ -64,7 +68,7 @@ messageRouter.put("/:messageId", async (req, res, next) => {
 });
 
 messageRouter.delete(
-  "/:messageId",
+  "/:userId/:chatId/:messageId",
 
   async (req, res, next) => {
     try {
