@@ -2,6 +2,7 @@ import express from "express";
 import createHttpError from "http-errors";
 import passport from "passport";
 import ChatModel from "./model.js";
+import UsersModel from "../users/model.js";
 
 const chatRouter = express.Router();
 chatRouter.get("/", async (req, res, next) => {
@@ -12,7 +13,6 @@ chatRouter.get("/", async (req, res, next) => {
     next(error);
   }
 });
-
 chatRouter.post("/:userId/chats", async (req, res, next) => {
   try {
     console.log("POST");
@@ -21,11 +21,28 @@ chatRouter.post("/:userId/chats", async (req, res, next) => {
       users: [req.params.userId, req.body.userId],
     });
     const { _id } = await newChat.save();
+    try {
+      const updateUser = await UsersModel.findByIdAndUpdate(
+        req.params.userId,
+        { $push: { chats: _id } },
+        { new: true, runValidators: true }
+      );
+      if (updateUser) {
+        res.send(updateUser);
+      } else {
+        next(
+          createHttpError(404, `user with id ${req.params.userId} not found`)
+        );
+      }
+    } catch (error) {
+      next(error);
+    }
     res.status(201).send({ _id });
   } catch (error) {
     next(error);
   }
 });
+
 chatRouter.get("/:chatId", async (req, res, next) => {
   try {
     const chat = await ChatModel.findById(req.params.chatId);
