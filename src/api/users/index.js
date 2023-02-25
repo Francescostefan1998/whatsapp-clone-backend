@@ -3,7 +3,7 @@ import createHttpError from "http-errors";
 import passport from "passport";
 import UsersModel from "./model.js";
 import { createAccessToken } from "../../lib/auth/tools.js";
-
+import { JWTAuthMiddleware } from "../../lib/auth/jwtAuth.js";
 const userRouter = express.Router();
 
 userRouter.get("/", async (req, res, next) => {
@@ -21,6 +21,40 @@ userRouter.post("/", async (req, res, next) => {
     const newUser = new UsersModel(req.body);
     const { _id } = await newUser.save();
     res.status(201).send({ _id });
+  } catch (error) {
+    next(error);
+  }
+});
+
+userRouter.get("/me", JWTAuthMiddleware, async (req, res, next) => {
+  try {
+    const user = await UsersModel.findById(req.user._id);
+    res.send(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
+userRouter.put("/me", JWTAuthMiddleware, async (req, res, next) => {
+  try {
+    const updatedUser = await UsersModel.findByIdAndUpdate(
+      req.user._id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    res.send(updatedUser);
+  } catch (error) {
+    next(error);
+  }
+});
+
+userRouter.delete("/me", JWTAuthMiddleware, async (req, res, next) => {
+  try {
+    await UsersModel.findByIdAndUpdate(req.user._id);
+    res.status(204).send();
   } catch (error) {
     next(error);
   }
