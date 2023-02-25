@@ -4,7 +4,7 @@ import passport from "passport";
 import ChatModel from "./model.js";
 
 const chatRouter = express.Router();
-chatRouter.get("/:userId", async (req, res, next) => {
+chatRouter.get("/", async (req, res, next) => {
   try {
     const chats = await ChatModel.find();
     res.send(chats);
@@ -13,12 +13,12 @@ chatRouter.get("/:userId", async (req, res, next) => {
   }
 });
 
-chatRouter.post("/:userId", async (req, res, next) => {
+chatRouter.post("/:userId/chats", async (req, res, next) => {
   try {
     console.log("POST");
     const newChat = new ChatModel({
       ...req.body,
-      users: [...users, req.params.userId],
+      users: [req.params.userId, req.body.userId],
     });
     const { _id } = await newChat.save();
     res.status(201).send({ _id });
@@ -26,7 +26,7 @@ chatRouter.post("/:userId", async (req, res, next) => {
     next(error);
   }
 });
-chatRouter.get("/:userId/:chatId", async (req, res, next) => {
+chatRouter.get("/:chatId", async (req, res, next) => {
   try {
     const chat = await ChatModel.findById(req.params.chatId);
     if (chat) {
@@ -39,7 +39,7 @@ chatRouter.get("/:userId/:chatId", async (req, res, next) => {
   }
 });
 
-chatRouter.put("/:userId/:chatId", async (req, res, next) => {
+chatRouter.put("/:chatId", async (req, res, next) => {
   try {
     const updateChat = await ChatModel.findByIdAndUpdate(
       req.params.chatId,
@@ -57,7 +57,7 @@ chatRouter.put("/:userId/:chatId", async (req, res, next) => {
 });
 
 chatRouter.delete(
-  "/:userId/:chatId",
+  "/:chatId",
 
   async (req, res, next) => {
     try {
