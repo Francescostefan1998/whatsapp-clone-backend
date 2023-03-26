@@ -8,12 +8,14 @@ import messageRouter from "./api/messages/index.js";
 import chatRouter from "./api/chats/index.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
+import { newConnectionHandler } from "./socket/index.js";
 
 const expressServer = express();
 
 const port = process.env.PORT || 3001;
 const httpServer = createServer(expressServer);
 const io = new Server(httpServer);
+io.on("connection", newConnectionHandler);
 expressServer.use(cors());
 expressServer.use(express.json());
 expressServer.use("/users", userRouter);
