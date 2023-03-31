@@ -5,7 +5,7 @@ export const newConnectionHandler = (newClient) => {
   newClient.emit("welcome", { message: `Hello ${newClient.id}` });
   newClient.on("setUsername", (payload) => {
     console.log(payload);
-    onlineUsers.push({ username: payload.firstName, socketId: newClient.id });
+    onlineUsers.push({ username: payload.firstName, socketId: newClient._id });
     newClient.emit("loggedIn", onlineUsers);
     newClient.broadcast.emit("updateOnlineUsers", onlineUsers);
   });
