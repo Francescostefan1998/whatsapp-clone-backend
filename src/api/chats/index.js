@@ -13,22 +13,21 @@ chatRouter.get("/", async (req, res, next) => {
     next(error);
   }
 });
-chatRouter.post("/:userId/chats", async (req, res, next) => {
+chatRouter.post("/", async (req, res, next) => {
   try {
     console.log("POST");
     const newChat = new ChatModel({
       ...req.body,
-      users: [req.params.userId, req.body.userId],
     });
     const { _id } = await newChat.save();
     try {
       const updateUser = await UsersModel.findByIdAndUpdate(
-        req.params.userId,
-        { $push: { chats: _id } },
+        req.body.users[0],
+        { $push: { chats: { $each: [_id], $position: 0 } } },
         { new: true, runValidators: true }
       );
       if (updateUser) {
-        res.send(updateUser);
+        res.send({ updateUser, newChat });
       } else {
         next(
           createHttpError(404, `user with id ${req.params.userId} not found`)
@@ -37,7 +36,6 @@ chatRouter.post("/:userId/chats", async (req, res, next) => {
     } catch (error) {
       next(error);
     }
-    res.status(201).send({ _id });
   } catch (error) {
     next(error);
   }
@@ -73,23 +71,28 @@ chatRouter.put("/:chatId", async (req, res, next) => {
   }
 });
 
-chatRouter.delete(
-  "/:chatId",
-
-  async (req, res, next) => {
-    try {
-      const deleteChat = await ChatModel.findByIdAndDelete(req.params.chatId);
-      if (deleteChat) {
+chatRouter.delete("/:chatId/:userId", async (req, res, next) => {
+  try {
+    const deleteChat = await ChatModel.findByIdAndDelete(req.params.chatId);
+    if (deleteChat) {
+      const updateUser = await UsersModel.findByIdAndUpdate(
+        req.params.userId,
+        { $pull: { chats: req.params.chatId } }, // use $pull to remove chatId from the array
+        { new: true, runValidators: true }
+      );
+      if (updateUser) {
         res.status(204).send("deleted");
       } else {
         next(
-          createHttpError(404, `chat with id ${req.params.chatId} not found`)
+          createHttpError(404, `user with id ${req.params.userId} not found`)
         );
       }
-    } catch (error) {
-      next(error);
+    } else {
+      next(createHttpError(404, `chat with id ${req.params.chatId} not found`));
     }
+  } catch (error) {
+    next(error);
   }
-);
+});
 
 export default chatRouter;
