@@ -26,6 +26,11 @@ chatRouter.post("/", async (req, res, next) => {
         { $push: { chats: { $each: [_id], $position: 0 } } },
         { new: true, runValidators: true }
       );
+      const updateOtherUser = await UsersModel.findByIdAndUpdate(
+        req.body.users[1],
+        { $push: { chats: { $each: [_id], $position: 0 } } },
+        { new: true, runValidators: true }
+      );
       if (updateUser) {
         res.send({ updateUser, newChat });
       } else {
@@ -71,12 +76,17 @@ chatRouter.put("/:chatId", async (req, res, next) => {
   }
 });
 
-chatRouter.delete("/:chatId/:userId", async (req, res, next) => {
+chatRouter.delete("/:chatId/:userId/:receiverId", async (req, res, next) => {
   try {
     const deleteChat = await ChatModel.findByIdAndDelete(req.params.chatId);
     if (deleteChat) {
       const updateUser = await UsersModel.findByIdAndUpdate(
         req.params.userId,
+        { $pull: { chats: req.params.chatId } }, // use $pull to remove chatId from the array
+        { new: true, runValidators: true }
+      );
+      const updateUserReceiver = await UsersModel.findByIdAndUpdate(
+        req.params.receiverId,
         { $pull: { chats: req.params.chatId } }, // use $pull to remove chatId from the array
         { new: true, runValidators: true }
       );
