@@ -13,7 +13,19 @@ export const newConnectionHandler = (newClient) => {
     console.log("new message", message);
     newClient.broadcast.emit("newMessage", message);
   });
+  newClient.on("startTyping", () => {
+    const user = onlineUsers.find((user) => user.socketId === newClient.id);
+    if (user) {
+      newClient.broadcast.emit("userTyping", user.username);
+    }
+  });
 
+  newClient.on("stopTyping", () => {
+    const user = onlineUsers.find((user) => user.socketId === newClient.id);
+    if (user) {
+      newClient.broadcast.emit("userStoppedTyping", user.username);
+    }
+  });
   newClient.on("disconnect", () => {
     onlineUsers = onlineUsers.filter((user) => user.socketId !== newClient.id);
     newClient.broadcast.emit("updateOnlineUsers", onlineUsers);
