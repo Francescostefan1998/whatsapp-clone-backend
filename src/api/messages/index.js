@@ -5,7 +5,7 @@ import MessageModel from "./model.js";
 import ChatModel from "../chats/model.js";
 
 const messageRouter = express.Router();
-messageRouter.get("/:userId/:chatId", async (req, res, next) => {
+messageRouter.get("/", async (req, res, next) => {
   try {
     const messages = await MessageModel.find();
     res.send(messages);
