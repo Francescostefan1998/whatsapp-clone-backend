@@ -8,6 +8,7 @@ const messageSchema = new Schema(
     chat: { type: Schema.Types.ObjectId, ref: "Chat" },
     user: { type: Schema.Types.ObjectId, ref: "User" },
     sender: { type: Schema.Types.ObjectId, ref: "User" },
+    hiddenFrom: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   {
     timestamps: true,
