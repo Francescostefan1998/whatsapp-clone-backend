@@ -9,6 +9,7 @@ const messageSchema = new Schema(
     user: { type: Schema.Types.ObjectId, ref: "User" },
     sender: { type: Schema.Types.ObjectId, ref: "User" },
     hiddenFrom: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    checked: { type: Boolean, default: false },
   },
   {
     timestamps: true,
