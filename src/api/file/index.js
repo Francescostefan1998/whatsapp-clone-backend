@@ -4,6 +4,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import UserModel from "../users/model.js";
 import createHttpError from "http-errors";
+import { trusted } from "mongoose";
 
 const fileUserRouter = express.Router();
 
@@ -22,7 +23,8 @@ fileUserRouter.post("/:userId", cloudinaryUploader, async (req, res, next) => {
     if (user) {
       const updateTheUserImage = await UserModel.findByIdAndUpdate(
         req.params.userId,
-        { avatar: req.files.path }
+        { image: req.file.path },
+        { new: true, runValidators: true }
       );
     } else {
       console.log("User not found");

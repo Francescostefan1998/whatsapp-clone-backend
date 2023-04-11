@@ -9,7 +9,7 @@ const usersSchema = new Schema(
     email: { type: String, required: true },
     password: { type: String, required: false },
     googleId: { type: String, required: false },
-    avatar: { type: String, required: false },
+    image: { type: String, required: false },
     chats: [{ type: Schema.Types.ObjectId, ref: "Chat" }],
   },
   {
