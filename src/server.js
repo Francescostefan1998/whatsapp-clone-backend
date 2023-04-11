@@ -9,6 +9,7 @@ import chatRouter from "./api/chats/index.js";
 import { Server } from "socket.io";
 import createAudioRouter from "./api/audio/index.js";
 import { createServer } from "http";
+import fileUserRouter from "./api/file/index.js";
 import { newConnectionHandler } from "./socket/index.js";
 
 const expressServer = express();
@@ -20,7 +21,7 @@ io.on("connection", newConnectionHandler);
 expressServer.use(cors());
 expressServer.use(express.json());
 expressServer.use("/users", userRouter);
-
+expressServer.use("/images", fileUserRouter);
 expressServer.use("/chats", chatRouter);
 expressServer.use("/messages", messageRouter);
 
