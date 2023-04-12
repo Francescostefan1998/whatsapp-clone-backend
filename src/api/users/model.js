@@ -10,6 +10,8 @@ const usersSchema = new Schema(
     password: { type: String, required: false },
     googleId: { type: String, required: false },
     image: { type: String, required: false },
+    about: { type: String, required: false },
+
     chats: [{ type: Schema.Types.ObjectId, ref: "Chat" }],
   },
   {

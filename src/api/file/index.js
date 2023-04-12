@@ -26,6 +26,7 @@ fileUserRouter.post("/:userId", cloudinaryUploader, async (req, res, next) => {
         { image: req.file.path },
         { new: true, runValidators: true }
       );
+      res.send(req.file.path);
     } else {
       console.log("User not found");
     }
